@@ -10,6 +10,8 @@ MongoClient.connect('mongodb+srv://yoda:Chosen1@cluster0.dcekc.mongodb.net/Clust
           console.log('Connected to Database')
           const db = client.db('star-wars-quotes')
           const quotesCollection = db.collection('quotes')
+          var num_of_Darth_vadar=0
+          var number=0
           
           app.use(bodyParser.urlencoded({ extended: true }))
           app.use(express.static('public'))
@@ -21,12 +23,22 @@ MongoClient.connect('mongodb+srv://yoda:Chosen1@cluster0.dcekc.mongodb.net/Clust
           })
 
           app.get('/', (req, res) => {
+                  db.collection('quotes').count()
+                    .then(results => {
+                          console.log(results)
+                          number=results
+                          //res.render('index.ejs', { name: "test" })
+                    })
+                  .catch(error => console.error(error))
+                  
                   db.collection('quotes').find().toArray()
                     .then(results => {
                           console.log(results)
-                          res.render('index.ejs', { quotes: results })
+                          res.render('index.ejs', { quotes: results,number: number })
+                          
                     })
                   .catch(error => console.error(error))
+                  
           // ...
           })
           
@@ -39,9 +51,13 @@ MongoClient.connect('mongodb+srv://yoda:Chosen1@cluster0.dcekc.mongodb.net/Clust
                   return res.json('No quote to delete')
                 }
                 res.json('Deleted Darth Vadar\'s quote')
+                
               })
               .catch(error => console.error(error))
           })
+          
+
+          
 
           app.put('/quotes', (req, res) => {
             quotesCollection.findOneAndUpdate(
@@ -69,9 +85,6 @@ MongoClient.connect('mongodb+srv://yoda:Chosen1@cluster0.dcekc.mongodb.net/Clust
                          })
                    .catch(error => console.error(error))
                    })
-
-
-          
           })
     .catch(error => console.error(error))
 
